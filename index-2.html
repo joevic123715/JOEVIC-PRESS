@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JOEVIC PRESS — Digital Products & Services</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0a0a0a;
+      --cream: #f5f0e8;
+      --gold: #b8962e;
+      --gold-light: #d4af5a;
+      --muted: #7a7065;
+      --border: rgba(184,150,46,0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--black);
+      color: var(--cream);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    .cursor, .cursor-ring {
+      position: fixed;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      border-radius: 50%;
+    }
+
+    .cursor {
+      width: 10px;
+      height: 10px;
+      background: var(--gold);
+      top: 0;
+      left: 0;
+    }
+
+    .cursor-ring {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--gold);
+      top: 0;
+      left: 0;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      background: rgba(10,10,10,0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .products {
+      padding: 4rem 2rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .product-card {
+      background: #111;
+      padding: 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .modal-content {
+      background: #111;
+      padding: 2rem;
+      width: 320px;
+      border: 1px solid var(--gold);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input {
+      padding: 10px;
+      background: #000;
+      border: 1px solid #333;
+      color: #fff;
+    }
+
+    button {
+      padding: 10px;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+
+    .btn-gold { background: var(--gold); }
+    .btn-dark { background: #222; color: #fff; }
+  </style>
+</head>
+
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a class="nav-logo">JOEVIC PRESS</a>
+</nav>
+
+<section class="hero">
+  <h1>Where Ideas Meet Craft</h1>
+</section>
+
+<section class="products">
+  <div class="product-card">Sample Product 1</div>
+  <div class="product-card">Sample Product 2</div>
+</section>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 style="color:white">Login</h3>
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button class="btn-gold" onclick="signup()">Sign Up</button>
+    <button class="btn-gold" onclick="login()">Login</button>
+    <button class="btn-dark" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbdhrj6dZGD7Ovh0SBnFJorRs2EdaU47g",
+    authDomain: "joevic-press.firebaseapp.com",
+    projectId: "joevic-press",
+    storageBucket: "joevic-press.appspot.com",
+    messagingSenderId: "848912444219",
+    appId: "1:848912444219:web:8dfd9e105ef783b5a8a51e"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  function signup() {
+    auth.createUserWithEmailAndPassword(email.value, password.value)
+      .then(()=>alert("Account created"))
+      .catch(e=>alert(e.message));
+  }
+
+  function login() {
+    auth.signInWithEmailAndPassword(email.value, password.value)
+      .then(()=>alert("Logged in"))
+      .catch(e=>alert(e.message));
+  }
+
+  function openModal(){ document.getElementById('modal').style.display='flex'; }
+  function closeModal(){ document.getElementById('modal').style.display='none'; }
+
+  document.addEventListener('mousemove', e=>{
+    document.getElementById('cursor').style.left=e.clientX+'px';
+    document.getElementById('cursor').style.top=e.clientY+'px';
+    document.getElementById('cursorRing').style.left=e.clientX+'px';
+    document.getElementById('cursorRing').style.top=e.clientY+'px';
+  });
+</script>
+
+</body>
+</html>
