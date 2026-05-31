@@ -1,118 +1,36 @@
-// ===============================
-// JOEVIC PRESS - Firebase Core
-// ===============================
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JOEVIC PRESS</title>
+</head>
+<body>
 
-// Firebase imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<h1>JOEVIC PRESS</h1>
 
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- AUTH -->
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
 
+<button onclick="signUp()">Sign Up</button>
+<button onclick="signIn()">Sign In</button>
+<button onclick="logout()">Logout</button>
 
-// ===============================
-// YOUR FIREBASE CONFIG
-// ===============================
-const firebaseConfig = {
-  apiKey: "AIzaSyAbdhrj6dZGD7Ovh0SBnFJorRs2EdaU47g",
-  authDomain: "joevic-press.firebaseapp.com",
-  projectId: "joevic-press",
-  storageBucket: "joevic-press.firebasestorage.app",
-  messagingSenderId: "848912444219",
-  appId: "1:848912444219:web:8dfd9e105ef783b5a8a51e",
-  measurementId: "G-6LKEXGCJS3"
-};
+<hr>
 
+<!-- UPLOAD -->
+<h3>Upload Ebook</h3>
 
-// ===============================
-// INIT FIREBASE
-// ===============================
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+<input id="title" placeholder="Title">
+<input id="desc" placeholder="Description">
+<button onclick="uploadBook()">Upload</button>
 
+<hr>
 
-// ===============================
-// ELEMENTS
-// ===============================
-const booksDiv = document.getElementById("books");
+<!-- BOOK LIST -->
+<h3>Books</h3>
+<div id="books"></div>
 
+<script type="module" src="app.js"></script>
 
-// ===============================
-// AUTH FUNCTIONS
-// ===============================
-window.signUp = function () {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  createUserWithEmailAndPassword(auth, email, password)
-    .then(() => alert("Account created"))
-    .catch(err => alert(err.message));
-};
-
-window.signIn = function () {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => alert("Logged in"))
-    .catch(err => alert(err.message));
-};
-
-window.logout = function () {
-  signOut(auth).then(() => alert("Logged out"));
-};
-
-
-// ===============================
-// UPLOAD BOOK (TEXT VERSION)
-// ===============================
-window.uploadBook = async function () {
-  const title = document.getElementById("title").value;
-  const desc = document.getElementById("desc").value;
-
-  if (!title || !desc) {
-    alert("Fill all fields");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, "ebooks"), {
-      title: title,
-      description: desc,
-      createdAt: Date.now()
-    });
-
-    alert("Book uploaded!");
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-
-// ===============================
-// REAL-TIME BOOK DISPLAY
-// ===============================
-onSnapshot(collection(db, "ebooks"), (snapshot) => {
-  booksDiv.innerHTML = "";
-
-  snapshot.forEach(doc => {
-    const b = doc.data();
-
-    booksDiv.innerHTML += `
-      <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-        <h3>${b.title}</h3>
-        <p>${b.description}</p>
-      </div>
-    `;
-  });
-});
+</body>
+</html>
