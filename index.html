@@ -1,99 +1,118 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JOEVIC PRESS</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-    }header {
-  padding: 70px 20px;
-  text-align: center;
-  background: linear-gradient(135deg, #1e3a8a, #0f172a);
-}
+// ===============================
+// JOEVIC PRESS - Firebase Core
+// ===============================
 
-h1 { font-size: 42px; margin: 0; }
-p { color: #cbd5e1; }
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-.container { padding: 30px 20px; max-width: 1000px; margin: auto; }
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
 
-.card {
-  background: #1e293b;
-  padding: 15px;
-  border-radius: 12px;
-}
+// ===============================
+// YOUR FIREBASE CONFIG
+// ===============================
+const firebaseConfig = {
+  apiKey: "AIzaSyAbdhrj6dZGD7Ovh0SBnFJorRs2EdaU47g",
+  authDomain: "joevic-press.firebaseapp.com",
+  projectId: "joevic-press",
+  storageBucket: "joevic-press.firebasestorage.app",
+  messagingSenderId: "848912444219",
+  appId: "1:848912444219:web:8dfd9e105ef783b5a8a51e",
+  measurementId: "G-6LKEXGCJS3"
+};
 
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  background: #3b82f6;
-  color: white;
-  cursor: pointer;
-  margin-top: 10px;
-}
 
-button:hover { background: #2563eb; }
+// ===============================
+// INIT FIREBASE
+// ===============================
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-.upload-box {
-  background: #111827;
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 20px;
-}
 
-input {
-  padding: 10px;
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: none;
-}
+// ===============================
+// ELEMENTS
+// ===============================
+const booksDiv = document.getElementById("books");
 
-footer {
-  text-align: center;
-  padding: 20px;
-  color: #94a3b8;
-}
 
-  </style>
-</head>
-<body><header>
-  <h1>JOEVIC PRESS</h1>
-  <p>Sell & Share Digital Products, Ebooks & Services</p>
-</header><div class="container">  <h2>📚 Available Ebooks</h2>
-  <div class="grid" id="bookList">
-    <div class="card">No ebooks yet</div>
-  </div>  <h2 style="margin-top:40px;">⬆ Upload Ebook (Demo)</h2>
-  <div class="upload-box">
-    <input type="text" id="title" placeholder="Ebook title" />
-    <button onclick="addBook()">Add Ebook</button>
-  </div>  <h2 style="margin-top:40px;">💳 Support / Payments</h2>
-  <div class="card">
-    <p>Support JOEVIC PRESS development</p>
-    <button onclick="alert('Payment system coming soon (Stripe/PayPal setup needed)')">Donate</button>
-  </div></div><footer>
-  © 2026 JOEVIC PRESS
-</footer><script>
-  function addBook() {
-    const title = document.getElementById('title').value;
-    if (!title) return;
+// ===============================
+// AUTH FUNCTIONS
+// ===============================
+window.signUp = function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerText = title;
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => alert("Account created"))
+    .catch(err => alert(err.message));
+};
 
-    document.getElementById('bookList').appendChild(card);
-    document.getElementById('title').value = '';
+window.signIn = function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => alert("Logged in"))
+    .catch(err => alert(err.message));
+};
+
+window.logout = function () {
+  signOut(auth).then(() => alert("Logged out"));
+};
+
+
+// ===============================
+// UPLOAD BOOK (TEXT VERSION)
+// ===============================
+window.uploadBook = async function () {
+  const title = document.getElementById("title").value;
+  const desc = document.getElementById("desc").value;
+
+  if (!title || !desc) {
+    alert("Fill all fields");
+    return;
   }
-</script></body>
-</html>
+
+  try {
+    await addDoc(collection(db, "ebooks"), {
+      title: title,
+      description: desc,
+      createdAt: Date.now()
+    });
+
+    alert("Book uploaded!");
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+
+// ===============================
+// REAL-TIME BOOK DISPLAY
+// ===============================
+onSnapshot(collection(db, "ebooks"), (snapshot) => {
+  booksDiv.innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const b = doc.data();
+
+    booksDiv.innerHTML += `
+      <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <h3>${b.title}</h3>
+        <p>${b.description}</p>
+      </div>
+    `;
+  });
+});
